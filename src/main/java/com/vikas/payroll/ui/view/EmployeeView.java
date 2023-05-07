@@ -16,16 +16,21 @@ public class EmployeeView extends VerticalLayout {
         add(new Span("Employee View"));
 
         GridCrud<Employee> crud = new GridCrud<>(Employee.class);
-        crud.setFindAllOperation(service::getEmployees);
 
         // search filter
         TextField filter = new TextField();
         filter.setPlaceholder("Filter by name");
         filter.setClearButtonVisible(true);
         crud.getCrudLayout().addFilterComponent(filter);
-//        crud.setAddOperation(service::add);
-//        crud.setUpdateOperation(service::update);
-//        crud.setDeleteOperation(service::delete);
+
+        crud.setFindAllOperation(()->service.getEmployeesContainingName(filter.getValue()));
+        //        crud.setAddOperation(service::add);
+        //        crud.setUpdateOperation(service::update);
+        //        crud.setDeleteOperation(service::delete);
+
+        filter.addValueChangeListener(e->crud.refreshGrid());
+
+
 
         crud.getGrid().setColumns("id", "name", "gender", "contactNumber", "department", "designation", "status");
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD, "id", "name", "gender", "dateOfBirth", "maritalStatus", "address",

@@ -21,5 +21,16 @@ public class PayrollService {
         return Arrays.stream(employeesArray != null ? employeesArray : new Employee[0]).collect(Collectors.toList());
     }
 
+    public List<Employee> getEmployeesContainingName(String name) {
+        Employee[] employeesArray = webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/employees/search").queryParam("name", name).build())
+                .retrieve().bodyToMono(Employee[].class).block();
+        return Arrays.stream(employeesArray != null ? employeesArray : new Employee[0]).collect(Collectors.toList());
+    }
+
+//    public void saveEmployees() {
+//        webClient.post().uri("/employees").retrieve().bodyToMono(Employee[].class).block();
+//        return Arrays.stream(employeesArray != null ? employeesArray : new Employee[0]).collect(Collectors.toList());
+//    }
 
 }
