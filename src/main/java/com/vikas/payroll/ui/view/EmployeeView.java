@@ -58,12 +58,20 @@ public class EmployeeView extends VerticalLayout {
         });
 
         // designation dropdown
+        crud.getCrudFormFactory().setFieldProvider("designation", emp -> {
+            return new ComboBox<>("Designation", service.getAllDesignations());
+        });
 
         // type dropdown
+        crud.getCrudFormFactory().setFieldProvider("type", emp -> {
+            return new ComboBox<>("Type", service.getAllTypes());
+        });
 
         // status dropdown
+        crud.getCrudFormFactory().setFieldProvider("status", emp -> {
+            return new ComboBox<>("Status", service.getAllStatus());
+        });
 
-        // other fields
     }
 
     private static TextField createSearchFilter(GridCrud<Employee> crud) {
