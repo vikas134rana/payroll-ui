@@ -1,5 +1,6 @@
 package com.vikas.payroll.ui.view;
 
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -9,6 +10,9 @@ import com.vikas.payroll.ui.rest.Employee;
 import com.vikas.payroll.ui.rest.PayrollService;
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
+import org.vaadin.crudui.form.impl.form.factory.DefaultCrudFormFactory;
+
+import java.util.Arrays;
 
 @Route(value = "employee", layout = MainLayout.class)
 public class EmployeeView extends VerticalLayout {
@@ -19,35 +23,56 @@ public class EmployeeView extends VerticalLayout {
         GridCrud<Employee> crud = new GridCrud<>(Employee.class);
 
         // search filter
-        TextField filter = new TextField();
-        filter.setPlaceholder("Filter by name");
-        filter.setClearButtonVisible(true);
-        crud.getCrudLayout().addFilterComponent(filter);
+        TextField searchFilter = createSearchFilter(crud);
 
+        // customise which columns to show on different UI(Grid, Add, Edit and Delete Employee)
+        setVisiblePropertiesForCrudOperations(crud);
+
+        // customise which endpoints to call for different CRUD operations (Add, Edit and Delete Employee)
+        setCrudOperations(service, crud, searchFilter);
+
+        // customise fields (dropdown, checkbox etc)
+        customiseFields(service, crud);
+
+        setSizeFull();
+        add(crud);
+    }
+
+    private static void customiseFields(PayrollService service, GridCrud<Employee> crud) {
+        DefaultCrudFormFactory<Employee> formFactory = new DefaultCrudFormFactory<>(Employee.class);
+        crud.setCrudFormFactory(formFactory);
+
+        // department dropdown
+        formFactory.setFieldProvider("department", emp -> {
+            return new ComboBox<>("Department", service.getAllDepartments());
+        });
+
+        // other fields
+    }
+
+    private static TextField createSearchFilter(GridCrud<Employee> crud) {
+        // search searchFilter
+        TextField searchFilter = new TextField();
+        searchFilter.setPlaceholder("Filter by name");
+        searchFilter.setClearButtonVisible(true);
+        crud.getCrudLayout().addFilterComponent(searchFilter);
+        searchFilter.addValueChangeListener(e -> crud.refreshGrid());
+        return searchFilter;
+    }
+
+    private static void setCrudOperations(PayrollService service, GridCrud<Employee> crud, TextField filter) {
         crud.setFindAllOperation(() -> service.getEmployeesContainingName(filter.getValue()));
         //        crud.setAddOperation(service::add);
         //        crud.setUpdateOperation(service::update);
         //        crud.setDeleteOperation(service::delete);
+    }
 
-        filter.addValueChangeListener(e -> crud.refreshGrid());
-
-
+    private static void setVisiblePropertiesForCrudOperations(GridCrud<Employee> crud) {
         crud.getGrid().setColumns("id", "name", "gender", "contactNumber", "department", "designation", "status");
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD, "name", "gender", "dateOfBirth", "maritalStatus", "address",
                 "contactNumber", "email", "department", "designation", "type", "status", "joiningDate", "lastWorkingDay");
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE, "id", "name", "gender", "dateOfBirth", "maritalStatus", "address",
                 "contactNumber", "email", "department", "designation", "type", "status", "joiningDate", "lastWorkingDay");
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.DELETE, "id", "name");
-
-       /* // logic configuration
-        crud.setOperations(
-                () -> service.findByNameContainingIgnoreCase(filter.getValue()),
-                user -> service.save(user),
-                user -> service.save(user),
-                user -> service.delete(user)
-        );*/
-
-        setSizeFull();
-        add(crud);
     }
 }
