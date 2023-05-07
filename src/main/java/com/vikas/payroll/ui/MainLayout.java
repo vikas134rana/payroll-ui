@@ -1,10 +1,11 @@
-package com.vikas.payroll.ui.view;
+package com.vikas.payroll.ui;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLink;
+import com.vikas.payroll.ui.view.*;
 
 public class MainLayout extends AppLayout {
 
