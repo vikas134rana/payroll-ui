@@ -1,6 +1,7 @@
 package com.vikas.payroll.ui.rest;
 
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -31,6 +32,36 @@ public class PayrollService {
         return Arrays.stream(employeesArray != null ? employeesArray : new Employee[0]).collect(Collectors.toList());
     }
 
+    public Employee createEmployees(Employee newEmployee) {
+        return webClient.post()
+                .uri("/employees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newEmployee)
+                .retrieve()
+                .bodyToMono(Employee.class)
+                .block();
+    }
+
+    public Employee updateEmployees(Employee updatedEmployee) {
+        return webClient.put()
+                .uri("/employees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedEmployee)
+                .retrieve()
+                .bodyToMono(Employee.class)
+                .block();
+    }
+
+    public Employee deleteEmployees(Long employeeId) {
+        return webClient.delete()
+                .uri("/employees/{id}", employeeId)
+                .retrieve()
+                .bodyToMono(Employee.class)
+                .block();
+    }
+
+
+    // ======================================== ENUM Endpoints =========================================================
     public List<String> getAllDepartments() {
         return webClient.get()
                 .uri("/enums/departments")
@@ -72,10 +103,5 @@ public class PayrollService {
                 .retrieve().bodyToMono(new ParameterizedTypeReference<List<String>>() {
                 }).block();
     }
-
-    /* public void saveEmployees() {
-        webClient.post().uri("/employees").retrieve().bodyToMono(Employee[].class).block();
-        return Arrays.stream(employeesArray != null ? employeesArray : new Employee[0]).collect(Collectors.toList());
-    }*/
 
 }

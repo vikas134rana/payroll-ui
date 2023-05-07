@@ -85,10 +85,10 @@ public class EmployeeView extends VerticalLayout {
     }
 
     private static void setCrudOperations(PayrollService service, GridCrud<Employee> crud, TextField filter) {
-        crud.setFindAllOperation(() -> service.getEmployeesContainingName(filter.getValue()));
-        //        crud.setAddOperation(service::add);
-        //        crud.setUpdateOperation(service::update);
-        //        crud.setDeleteOperation(service::delete);
+        crud.setAddOperation(service::createEmployees); // CREATE
+        crud.setFindAllOperation(() -> service.getEmployeesContainingName(filter.getValue())); // READ
+        crud.setUpdateOperation(service::updateEmployees); // UPDATE
+        crud.setDeleteOperation(emp -> service.deleteEmployees(emp.getId())); // DELETE
     }
 
     private static void setVisiblePropertiesForCrudOperations(GridCrud<Employee> crud) {
