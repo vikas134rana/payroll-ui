@@ -45,6 +45,13 @@ public class PayrollService {
                 }).block();
     }
 
+    public List<String> getAllMaritalStatus() {
+        return webClient.get()
+                .uri("/enums/marital_status")
+                .retrieve().bodyToMono(new ParameterizedTypeReference<List<String>>() {
+                }).block();
+    }
+
     /* public void saveEmployees() {
         webClient.post().uri("/employees").retrieve().bodyToMono(Employee[].class).block();
         return Arrays.stream(employeesArray != null ? employeesArray : new Employee[0]).collect(Collectors.toList());

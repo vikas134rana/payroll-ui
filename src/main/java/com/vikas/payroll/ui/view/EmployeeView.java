@@ -52,6 +52,17 @@ public class EmployeeView extends VerticalLayout {
             return new ComboBox<>("Gender", service.getAllGenders());
         });
 
+        // marital_status dropdown
+        crud.getCrudFormFactory().setFieldProvider("maritalStatus", emp -> {
+            return new ComboBox<>("Marital Status", service.getAllMaritalStatus());
+        });
+
+        // designation dropdown
+
+        // type dropdown
+
+        // status dropdown
+
         // other fields
     }
 
