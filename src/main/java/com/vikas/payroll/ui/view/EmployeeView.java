@@ -12,8 +12,6 @@ import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
 import org.vaadin.crudui.form.impl.form.factory.DefaultCrudFormFactory;
 
-import java.util.Arrays;
-
 @Route(value = "employee", layout = MainLayout.class)
 public class EmployeeView extends VerticalLayout {
 
@@ -21,6 +19,10 @@ public class EmployeeView extends VerticalLayout {
         add(new Span("Employee View"));
 
         GridCrud<Employee> crud = new GridCrud<>(Employee.class);
+
+        // custom form factory
+        DefaultCrudFormFactory<Employee> customFormFactory = new DefaultCrudFormFactory<>(Employee.class);
+        crud.setCrudFormFactory(customFormFactory);
 
         // search filter
         TextField searchFilter = createSearchFilter(crud);
@@ -39,12 +41,15 @@ public class EmployeeView extends VerticalLayout {
     }
 
     private static void customiseFields(PayrollService service, GridCrud<Employee> crud) {
-        DefaultCrudFormFactory<Employee> formFactory = new DefaultCrudFormFactory<>(Employee.class);
-        crud.setCrudFormFactory(formFactory);
 
         // department dropdown
-        formFactory.setFieldProvider("department", emp -> {
+        crud.getCrudFormFactory().setFieldProvider("department", emp -> {
             return new ComboBox<>("Department", service.getAllDepartments());
+        });
+
+        // gender dropdown
+        crud.getCrudFormFactory().setFieldProvider("gender", emp -> {
+            return new ComboBox<>("Gender", service.getAllGenders());
         });
 
         // other fields
