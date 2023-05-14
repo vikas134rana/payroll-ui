@@ -5,7 +5,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vikas.payroll.ui.MainLayout;
 
-@Route(value = "Support", layout = MainLayout.class)
+@Route(value = "support", layout = MainLayout.class)
 public class SupportView extends VerticalLayout {
 
     public SupportView() {

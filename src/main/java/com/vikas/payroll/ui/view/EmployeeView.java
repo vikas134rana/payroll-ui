@@ -1,18 +1,19 @@
 package com.vikas.payroll.ui.view;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLink;
 import com.vikas.payroll.ui.MainLayout;
+import com.vikas.payroll.ui.rest.BankDetails;
 import com.vikas.payroll.ui.rest.Employee;
 import com.vikas.payroll.ui.rest.PayrollService;
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
+import org.vaadin.crudui.form.CrudFormFactory;
 import org.vaadin.crudui.form.impl.form.factory.DefaultCrudFormFactory;
 
 @Route(value = "employee", layout = MainLayout.class)
@@ -23,41 +24,39 @@ public class EmployeeView extends VerticalLayout {
 
         GridCrud<Employee> employeeCrud = getEmployeeGridCrud(service);
 
-        TabSheet tabSheet = new TabSheet();
-        tabSheet.add("Employee", employeeCrud);
-        tabSheet.add("Bank Details",
-                new Div(new Text("This is the Bank Detail tab content")));
-        tabSheet.setSizeFull();
-
         setSizeFull();
-        add(tabSheet);
+        add(employeeCrud);
     }
 
-    private static GridCrud<Employee> getEmployeeGridCrud(PayrollService service) {
-        GridCrud<Employee> employeeCrud = new GridCrud<>(Employee.class);
+    private GridCrud<Employee> getEmployeeGridCrud(PayrollService service) {
+        GridCrud<Employee> employeeGridCrud = new GridCrud<>(Employee.class);
 
         // custom form factory
         DefaultCrudFormFactory<Employee> employeeDefaultCrudFormFactory = new DefaultCrudFormFactory<>(Employee.class);
-        employeeCrud.setCrudFormFactory(employeeDefaultCrudFormFactory);
+        employeeGridCrud.setCrudFormFactory(employeeDefaultCrudFormFactory);
 
         // search filter
-        TextField searchFilter = createSearchFilter(employeeCrud);
+        TextField searchFilter = createSearchFilter(employeeGridCrud);
 
         // customise which columns to show on different UI(Grid, Add, Edit and Delete Employee)
-        setVisiblePropertiesForCrudOperations(employeeCrud);
+        setVisiblePropertiesForCrudOperations(employeeGridCrud);
 
         // customise which endpoints to call for different CRUD operations (Add, Edit and Delete Employee)
-        setCrudOperations(service, employeeCrud, searchFilter);
+        setCrudOperations(service, employeeGridCrud, searchFilter);
 
         // customise fields (dropdown, checkbox etc)
-        customiseFields(service, employeeCrud);
+        customiseFields(service, employeeGridCrud);
 
+        // Add button to navigate to BankDetails Crud UI
+        employeeGridCrud.getGrid().addColumn(new ComponentRenderer<>(employee -> {
+            return new RouterLink("View Bank Details", BankDetailsView.class, employee.getId());
+        })).setHeader("Actions");
 
-        employeeCrud.setSizeFull();
-        return employeeCrud;
+        employeeGridCrud.setSizeFull();
+        return employeeGridCrud;
     }
 
-    private static void customiseFields(PayrollService service, GridCrud<Employee> crud) {
+    private void customiseFields(PayrollService service, GridCrud<Employee> crud) {
 
         // department dropdown
         crud.getCrudFormFactory().setFieldProvider("department", emp -> {
@@ -91,7 +90,7 @@ public class EmployeeView extends VerticalLayout {
 
     }
 
-    private static TextField createSearchFilter(GridCrud<Employee> crud) {
+    private TextField createSearchFilter(GridCrud<Employee> crud) {
         // search searchFilter
         TextField searchFilter = new TextField();
         searchFilter.setPlaceholder("Filter by name");
@@ -101,14 +100,14 @@ public class EmployeeView extends VerticalLayout {
         return searchFilter;
     }
 
-    private static void setCrudOperations(PayrollService service, GridCrud<Employee> crud, TextField filter) {
-        crud.setAddOperation(service::createEmployees); // CREATE
+    private void setCrudOperations(PayrollService service, GridCrud<Employee> crud, TextField filter) {
+        crud.setAddOperation(service::createEmployee); // CREATE
         crud.setFindAllOperation(() -> service.getEmployeesContainingName(filter.getValue())); // READ
-        crud.setUpdateOperation(service::updateEmployees); // UPDATE
-        crud.setDeleteOperation(emp -> service.deleteEmployees(emp.getId())); // DELETE
+        crud.setUpdateOperation(service::updateEmployee); // UPDATE
+        crud.setDeleteOperation(emp -> service.deleteEmployee(emp.getId())); // DELETE
     }
 
-    private static void setVisiblePropertiesForCrudOperations(GridCrud<Employee> crud) {
+    private void setVisiblePropertiesForCrudOperations(GridCrud<Employee> crud) {
         crud.getGrid().setColumns("id", "name", "gender", "contactNumber", "department", "designation", "status");
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD, "name", "gender", "dateOfBirth", "maritalStatus", "address",
                 "contactNumber", "email", "department", "designation", "type", "status", "joiningDate", "lastWorkingDay");

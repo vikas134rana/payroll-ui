@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO: using block() recommended in production systems. It's recommended to use reactive programming instead.
+// TODO: use flux for list ?
 @Service
 public class PayrollService {
 
@@ -32,7 +34,7 @@ public class PayrollService {
         return Arrays.stream(employeesArray != null ? employeesArray : new Employee[0]).collect(Collectors.toList());
     }
 
-    public Employee createEmployees(Employee newEmployee) {
+    public Employee createEmployee(Employee newEmployee) {
         return webClient.post()
                 .uri("/employees")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -42,7 +44,7 @@ public class PayrollService {
                 .block();
     }
 
-    public Employee updateEmployees(Employee updatedEmployee) {
+    public Employee updateEmployee(Employee updatedEmployee) {
         return webClient.put()
                 .uri("/employees")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -52,14 +54,47 @@ public class PayrollService {
                 .block();
     }
 
-    public Employee deleteEmployees(Long employeeId) {
-        return webClient.delete()
+    public void deleteEmployee(Long employeeId) {
+        webClient.delete()
                 .uri("/employees/{id}", employeeId)
-                .retrieve()
-                .bodyToMono(Employee.class)
+                .exchange()
                 .block();
     }
 
+    public BankDetails getBankDetails(Long employeeId) {
+        return webClient.get()
+                .uri("/employees/{id}/bank_details", employeeId)
+                .retrieve()
+                .bodyToMono(BankDetails.class)
+                .block();
+    }
+
+    public BankDetails createBankDetails(Long employeeId, BankDetails bankDetails) {
+        return webClient.post()
+                .uri("/employees/{employeeId}/bank_details", employeeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(bankDetails)
+                .retrieve()
+                .bodyToMono(BankDetails.class)
+                .block();
+    }
+
+    public BankDetails updateBankDetails(Long employeeId, BankDetails bankDetails) {
+        return webClient.put()
+                .uri("/employees/{employeeId}/bank_details", employeeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(bankDetails)
+                .retrieve()
+                .bodyToMono(BankDetails.class)
+                .block();
+    }
+
+    public void deleteBankDetails(Long employeeId) {
+        webClient.delete()
+                .uri("/employees/{id}/bank_details", employeeId)
+                .exchange()
+                .block();
+    }
 
     // ======================================== ENUM Endpoints =========================================================
     public List<String> getAllDepartments() {
