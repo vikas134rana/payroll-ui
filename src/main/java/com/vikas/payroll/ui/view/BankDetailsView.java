@@ -2,6 +2,8 @@ package com.vikas.payroll.ui.view;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.BeforeEvent;
@@ -61,7 +63,16 @@ public class BankDetailsView extends VerticalLayout implements HasUrlParameter<L
     }
 
     private void setCrudOperations(PayrollService service, GridCrud<BankDetails> crud) {
-        crud.setAddOperation(bankDetails -> service.createBankDetails(this.employeeId, bankDetails)); // CREATE
+        crud.setAddOperation(bankDetails -> {
+            if(service.getEmployeeCount() == 0) {
+                return service.createBankDetails(this.employeeId, bankDetails);
+            }
+            else {
+                Notification errorNotification = Notification.show ("Add BankDetails Failed - Only one row of Bank Details is allowed for an employee.");
+                errorNotification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                return null;
+            }
+        }); // CREATE
         crud.setFindAllOperation(() -> Collections.singleton(service.getBankDetails(employeeId))); // GET
         crud.setUpdateOperation(bankDetails -> service.updateBankDetails(employeeId, bankDetails)); // UPDATE
         crud.setDeleteOperationVisible(false); // DELETE (don't allow)

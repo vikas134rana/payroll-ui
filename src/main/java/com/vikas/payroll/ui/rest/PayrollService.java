@@ -61,6 +61,14 @@ public class PayrollService {
                 .block();
     }
 
+    public Long getEmployeeCount() {
+        return webClient.get()
+                .uri("/employees/count")
+                .retrieve()
+                .bodyToMono(Long.class)
+                .block();
+    }
+
     public BankDetails getBankDetails(Long employeeId) {
         return webClient.get()
                 .uri("/employees/{id}/bank_details", employeeId)
