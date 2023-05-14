@@ -2,6 +2,7 @@ package com.vikas.payroll.ui.view;
 
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -47,9 +48,11 @@ public class EmployeeView extends VerticalLayout {
         // customise fields (dropdown, checkbox etc)
         customiseFields(service, employeeGridCrud);
 
-        // Add button to navigate to BankDetails Crud UI
+        // Add Actions button to navigate to BankDetails and Salary
         employeeGridCrud.getGrid().addColumn(new ComponentRenderer<>(employee -> {
-            return new RouterLink("View Bank Details", BankDetailsView.class, employee.getId());
+            RouterLink bankLink = new RouterLink("Bank", BankDetailsView.class, employee.getId());
+            RouterLink salaryLink = new RouterLink("Salary", SalaryView.class, employee.getId());
+            return new HorizontalLayout(bankLink, salaryLink);
         })).setHeader("Actions");
 
         employeeGridCrud.setSizeFull();

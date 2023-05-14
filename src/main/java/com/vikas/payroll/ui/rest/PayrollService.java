@@ -97,10 +97,31 @@ public class PayrollService {
                 .block();
     }
 
-    public void deleteBankDetails(Long employeeId) {
-        webClient.delete()
-                .uri("/employees/{id}/bank_details", employeeId)
-                .exchange()
+    public Salary getSalary(Long employeeId) {
+        return webClient.get()
+                .uri("/employees/{id}/salary", employeeId)
+                .retrieve()
+                .bodyToMono(Salary.class)
+                .block();
+    }
+
+    public Salary createSalary(Long employeeId, Salary salary) {
+        return webClient.post()
+                .uri("/employees/{employeeId}/salary", employeeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(salary)
+                .retrieve()
+                .bodyToMono(Salary.class)
+                .block();
+    }
+
+    public Salary updateSalary(Long employeeId, Salary salary) {
+        return webClient.put()
+                .uri("/employees/{employeeId}/salary", employeeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(salary)
+                .retrieve()
+                .bodyToMono(Salary.class)
                 .block();
     }
 
