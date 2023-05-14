@@ -64,6 +64,7 @@ public class BankDetailsView extends VerticalLayout implements HasUrlParameter<L
         crud.setAddOperation(bankDetails -> service.createBankDetails(this.employeeId, bankDetails)); // CREATE
         crud.setFindAllOperation(() -> Collections.singleton(service.getBankDetails(employeeId))); // GET
         crud.setUpdateOperation(bankDetails -> service.updateBankDetails(employeeId, bankDetails)); // UPDATE
+        crud.setDeleteOperationVisible(false); // DELETE (don't allow)
     }
 
     private void setVisiblePropertiesForCrudOperations(GridCrud<BankDetails> crud) {
